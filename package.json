@@ -7,7 +7,7 @@
     "install": "node-gyp rebuild"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "nan": "^2.2.0"
   }
