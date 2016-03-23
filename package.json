@@ -1,5 +1,5 @@
 {
-  "name": "node-sysv-msg",
+  "name": "svmq",
   "version": "1.0.0",
   "description": "Native System V (svipc) message queues in Node.js",
   "main": "index.js",
