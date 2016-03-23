@@ -1,0 +1,14 @@
+{
+  "name": "node-sysv-msg",
+  "version": "1.0.0",
+  "description": "Native System V (svipc) message queues in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "install": "node-gyp rebuild"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nan": "^2.2.0"
+  }
+}
