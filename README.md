@@ -74,7 +74,61 @@ var closed = queue.close();
 var closed = queue.close((err, closed) => {
   if (err) throw err;
 });
+```
 
+### Multiplexing / Two-way communication
+Opening a queue via the same key from two different processes will give both
+processes access to the same data structure, but after all, it's still a queue.
+This means that proper two-way communication needs either two queues or some
+way to multiplex one queue.
+
+Fortunately, each message sent to the queue has an associated message type.
+When you pop a message off, you ask for message type `0` by default. This tells
+the system that you want the message from the front of the queue, no matter what
+message type it is. If you pass a positive integer greater than zero, the queue
+will give you the first message that resides in the queue with that message type
+or block until it's available (via callback).
+
+In other words, you can achieve two-way communication between processes by using
+two distinct message types. See the example below.
+
+```javascript
+// Process A
+var queue = MessageQueue.open(31337);
+queue.push('Hello from A', { type: 100 });
+queue.pop({ type: 200 }, (err, data) => {
+  // data == 'Hello from B'
+});
+
+// Process B
+var queue = MessageQueue.open(31337);
+queue.push('Hello from B', { type: 200 });
+queue.pop({ type: 100 }, (err, data) => {
+  // data == 'Hello from A'
+});
+```
+
+_Note: the 'data' event does not support message types yet, so you'll have to
+construct your own receiving loop. See the example below._
+
+```javascript
+var queue = MessageQueue.open(31337);
+
+function popMessage() {
+  queue.pop((err, data) => {
+    if (err) throw err;
+
+    // Do something with the data
+    console.log(data.toString());
+
+    setImmediate(popMessage);
+    // Note: pop() only calls back when a message is available in the queue. The
+    // call stays blocked until a process pushes a message to the queue, so this
+    // does not consume excess resources.
+  });
+}
+
+popMessage();
 ```
 
 ### Access to native bindings
