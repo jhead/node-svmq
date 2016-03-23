@@ -3,6 +3,15 @@ Native System V IPC message queues in Node.js with bindings and an easy to use a
 
 These are FIFO queues. New messages are pushed to the end and old messages are popped off first.
 
+## Why?
+The keyword here is _IPC_. These queues exist in kernel space; they can be accessed by multiple processes,
+assuming the correct permissions, etc. This provides a portable method for passing messages between
+two completely unrelated processes using potentially different languages/runtimes.
+
+For example, PHP has native support for SysV IPC including message queues. That means you can now easily
+serialize PHP objects to JSON and pass them to Node.js (and vice versa) without messing with pipes,
+sockets, etc. and without having to spawn processes from within Node.js.
+
 ## Installation
 `npm install svmq`
 
@@ -57,8 +66,15 @@ queue.pop((err, data) => {
 ```javascript
 // Close the queue immediately
 // Returns true/false, specifying whether or not the queue closed.
+// Can be used with a callback to catch errors on close.
+//
 // Note: this may require escalated privileges on some OSes.
-queue.close();
+var closed = queue.close();
+// OR (closed status will be returned and passed to callback)
+var closed = queue.close((err, closed) => {
+  if (err) throw err;
+});
+
 ```
 
 ### Access to native bindings
