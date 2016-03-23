@@ -1,6 +1,6 @@
 {
   "name": "svmq",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Native System V (svipc) message queues in Node.js",
   "main": "index.js",
   "scripts": {
