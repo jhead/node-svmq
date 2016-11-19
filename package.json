@@ -1,13 +1,33 @@
 {
   "name": "svmq",
-  "version": "1.0.2",
-  "description": "Native System V (svipc) message queues in Node.js",
+  "version": "1.0.3",
+  "description": "Native System V message queues in Node.js",
   "main": "index.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "install": "node-gyp rebuild"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhead/node-svmq.git"
+  },
+  "keywords": [
+    "system",
+    "v",
+    "sysv",
+    "mq",
+    "message",
+    "queue",
+    "svmq",
+    "ipc"
+  ],
+  "author": "Justin Head <jhead@jxh.io>",
   "license": "MIT",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/jhead/node-svmq/issues"
+  },
+  "homepage": "https://github.com/jhead/node-svmq#readme",
   "dependencies": {
     "nan": "^2.2.0"
   }
