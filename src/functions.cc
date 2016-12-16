@@ -12,12 +12,11 @@ using Nan::Callback;
 using Nan::New;
 using Nan::Null;
 
-#ifndef __USE_GNU
-
 #ifndef MSGMAX
 #define MSGMAX 4056
 #endif
 
+#ifndef linux
 struct msgbuf {
   long mtype;
   char mtext[MSGMAX - 4];
