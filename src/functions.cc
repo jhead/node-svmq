@@ -19,7 +19,7 @@ using Nan::Null;
 #ifndef linux
 struct msgbuf {
   long mtype;
-  char mtext[MSGMAX - 4];
+  char mtext[1];
 };
 #endif
 
@@ -43,13 +43,16 @@ class SendMessageWorker : public AsyncWorker {
     ~SendMessageWorker() { }
 
     void Execute() {
-      msgbuf *message = new msgbuf;
-      message->mtype = type;
+      struct msgbuf* message =
+        (struct msgbuf*)malloc(sizeof(struct msgbuf) + dataLength);
 
+      message->mtype = type;
       memcpy(message->mtext, data, dataLength);
 
       ret = msgsnd(id, message, dataLength, flags);
       error = errno;
+
+      free(message);
     }
 
     void HandleOKCallback () {
