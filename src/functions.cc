@@ -23,6 +23,8 @@ struct msgbuf {
 };
 #endif
 
+const size_t bsize = sizeof(struct msgbuf);
+
 const char *ConcatString(std::string one, const char *two) {
   return one.append(two).c_str();
 }
@@ -44,7 +46,7 @@ class SendMessageWorker : public AsyncWorker {
 
     void Execute() {
       struct msgbuf* message =
-        (struct msgbuf*)malloc(sizeof(struct msgbuf) + dataLength);
+        (struct msgbuf*)malloc(bsize + dataLength);
 
       message->mtype = type;
       memcpy(message->mtext, data, dataLength);
@@ -68,7 +70,7 @@ class SendMessageWorker : public AsyncWorker {
   private:
     int id;
     char *data;
-    int dataLength;
+    size_t dataLength;
     long type;
     int flags;
     int ret;
@@ -84,7 +86,8 @@ class ReceiveMessageWorker : public AsyncWorker {
     ~ReceiveMessageWorker() { }
 
     void Execute() {
-      message = new msgbuf;
+      struct msgbuf* message =
+        (struct msgbuf*)malloc(bsize + bufferLength);
 
       bufferLength = msgrcv(id, message, bufferLength, type, flags);
       error = errno;
@@ -174,7 +177,7 @@ NAN_METHOD(SendMessage) {
   int id = info[0]->Int32Value();
   char* bufferData = node::Buffer::Data(info[1]);
   size_t bufferLength = (size_t)  node::Buffer::Length(info[1]);
-  long type = info[2]->Int32Value();
+  long type = (long) info[2]->Int32Value();
   int flags = info[3]->Int32Value();
   Callback *callback = new Callback(info[4].As<Function>());
 
@@ -184,7 +187,7 @@ NAN_METHOD(SendMessage) {
 NAN_METHOD(ReceiveMessage) {
   int id = info[0]->Int32Value();
   size_t bufferLength = (size_t) info[1]->Int32Value();
-  long type = info[2]->Int32Value();
+  long type = (long) info[2]->Int32Value();
   int flags = info[3]->Int32Value();
   Callback *callback = new Callback(info[4].As<Function>());
 
