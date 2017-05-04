@@ -19,9 +19,11 @@ using Nan::Null;
 #ifndef linux
 struct msgbuf {
   long mtype;
-  char mtext[MSGMAX - 4];
+  char mtext[1];
 };
 #endif
+
+const size_t bsize = sizeof(struct msgbuf);
 
 const char *ConcatString(std::string one, const char *two) {
   return one.append(two).c_str();
@@ -43,13 +45,16 @@ class SendMessageWorker : public AsyncWorker {
     ~SendMessageWorker() { }
 
     void Execute() {
-      msgbuf *message = new msgbuf;
-      message->mtype = type;
+      struct msgbuf* message =
+        (struct msgbuf*)malloc(bsize + dataLength);
 
+      message->mtype = type;
       memcpy(message->mtext, data, dataLength);
 
       ret = msgsnd(id, message, dataLength, flags);
       error = errno;
+
+      free(message);
     }
 
     void HandleOKCallback () {
@@ -65,7 +70,7 @@ class SendMessageWorker : public AsyncWorker {
   private:
     int id;
     char *data;
-    int dataLength;
+    size_t dataLength;
     long type;
     int flags;
     int ret;
@@ -81,7 +86,8 @@ class ReceiveMessageWorker : public AsyncWorker {
     ~ReceiveMessageWorker() { }
 
     void Execute() {
-      message = new msgbuf;
+      struct msgbuf* message =
+        (struct msgbuf*)malloc(bsize + bufferLength);
 
       bufferLength = msgrcv(id, message, bufferLength, type, flags);
       error = errno;
@@ -171,7 +177,7 @@ NAN_METHOD(SendMessage) {
   int id = info[0]->Int32Value();
   char* bufferData = node::Buffer::Data(info[1]);
   size_t bufferLength = (size_t)  node::Buffer::Length(info[1]);
-  long type = info[2]->Int32Value();
+  long type = (long) info[2]->Int32Value();
   int flags = info[3]->Int32Value();
   Callback *callback = new Callback(info[4].As<Function>());
 
@@ -181,7 +187,7 @@ NAN_METHOD(SendMessage) {
 NAN_METHOD(ReceiveMessage) {
   int id = info[0]->Int32Value();
   size_t bufferLength = (size_t) info[1]->Int32Value();
-  long type = info[2]->Int32Value();
+  long type = (long) info[2]->Int32Value();
   int flags = info[3]->Int32Value();
   Callback *callback = new Callback(info[4].As<Function>());
 
