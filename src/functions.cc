@@ -86,8 +86,8 @@ class ReceiveMessageWorker : public AsyncWorker {
     ~ReceiveMessageWorker() { }
 
     void Execute() {
-      struct msgbuf* message =
-        (struct msgbuf*)malloc(bsize + bufferLength);
+      message =
+        (struct msgbuf*) malloc(bsize + bufferLength);
 
       bufferLength = msgrcv(id, message, bufferLength, type, flags);
       error = errno;
@@ -105,12 +105,14 @@ class ReceiveMessageWorker : public AsyncWorker {
         argv[1] = Nan::CopyBuffer(message->mtext, bufferLength).ToLocalChecked();
       }
 
+      free(message);
+
       callback->Call(2, argv);
     }
 
   private:
     int id;
-    msgbuf *message;
+    struct msgbuf* message;
     size_t bufferLength;
     long type;
     int flags;
