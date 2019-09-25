@@ -120,8 +120,8 @@ class ReceiveMessageWorker : public AsyncWorker {
 };
 
 NAN_METHOD(GetMessageQueue) {
-  key_t key = (key_t) info[0]->Int32Value();
-  int flags = info[1]->Int32Value();
+  key_t key = (key_t) Nan::To<int32_t>(info[0]).FromJust();
+  int flags = Nan::To<int32_t>(info[1]).FromJust();
 
   int queue = msgget(key, flags);
 
@@ -133,8 +133,8 @@ NAN_METHOD(GetMessageQueue) {
 }
 
 NAN_METHOD(ControlMessageQueue) {
-  int id = info[0]->Int32Value();
-  int cmd = info[1]->Int32Value();
+  int id = Nan::To<int32_t>(info[0]).FromJust();
+  int cmd = Nan::To<int32_t>(info[1]).FromJust();
 
   msqid_ds *buf;
 
@@ -164,7 +164,7 @@ NAN_METHOD(ControlMessageQueue) {
 }
 
 NAN_METHOD(CloseMessageQueue) {
-  int id = info[0]->Int32Value();
+  int id = Nan::To<int32_t>(info[0]).FromJust();
 
   int ret = msgctl(id, IPC_RMID, nullptr);
 
@@ -176,21 +176,21 @@ NAN_METHOD(CloseMessageQueue) {
 }
 
 NAN_METHOD(SendMessage) {
-  int id = info[0]->Int32Value();
+  int id = Nan::To<int32_t>(info[0]).FromJust();
   char* bufferData = node::Buffer::Data(info[1]);
   size_t bufferLength = (size_t)  node::Buffer::Length(info[1]);
-  long type = (long) info[2]->Int32Value();
-  int flags = info[3]->Int32Value();
+  long type = (long) Nan::To<int32_t>(info[2]).FromJust();
+  int flags = Nan::To<int32_t>(info[3]).FromJust();
   Callback *callback = new Callback(info[4].As<Function>());
 
   AsyncQueueWorker(new SendMessageWorker(callback, id, bufferData, bufferLength, type, flags));
 }
 
 NAN_METHOD(ReceiveMessage) {
-  int id = info[0]->Int32Value();
-  size_t bufferLength = (size_t) info[1]->Int32Value();
-  long type = (long) info[2]->Int32Value();
-  int flags = info[3]->Int32Value();
+  int id = Nan::To<int32_t>(info[0]).FromJust();
+  size_t bufferLength = (size_t) Nan::To<int32_t>(info[1]).FromJust();
+  long type = (long) Nan::To<int32_t>(info[2]).FromJust();
+  int flags = Nan::To<int32_t>(info[3]).FromJust();
   Callback *callback = new Callback(info[4].As<Function>());
 
   AsyncQueueWorker(new ReceiveMessageWorker(callback, id, bufferLength, type, flags));
