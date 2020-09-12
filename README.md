@@ -148,7 +148,7 @@ var MSGMAX = svmq.MSGMAX; // max message data size (hardcoded)
 var id = msg.get(31337, 950);
 
 // Push a string to the queue
-msg.snd(id, new Buffer('TestString1234'), 1, (err) => {
+msg.snd(id, new Buffer('TestString1234'), 1, 0, (err) => {
   if (err) throw err;
 });
 
